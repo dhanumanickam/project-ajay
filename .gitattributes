@@ -1,0 +1,8 @@
+# Treat binaries properly
+*.png binary
+*.pdf binary
+*.sqlite3 binary
+*.pyc binary
+
+# Set default line endings
+* text=auto
