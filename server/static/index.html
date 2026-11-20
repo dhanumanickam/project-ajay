@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDBMS - Intelligent Distributed Database Management System</title>
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
+
+  <!-- Top Navigation Bar -->
+  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+          <i class="fa-solid fa-network-wired text-white text-lg"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-white tracking-tight flex items-center gap-2">
+            IDBMS Console <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 font-medium border border-blue-500/30">v2.0 Enterprise</span>
+          </h1>
+          <p class="text-xs text-slate-400">Intelligent Distributed Database Management System for Multi-Branch Organizations</p>
+        </div>
+      </div>
+
+      <!-- Quick Cluster Stats -->
+      <div class="flex items-center space-x-6 text-sm">
+        <div class="flex items-center space-x-2">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-slate-300 font-medium">Cluster: 4 Nodes Online</span>
+        </div>
+        <div class="text-slate-400 border-l border-slate-800 pl-4">
+          Protocol: <span class="text-slate-200 font-semibold">Strict 2PC + SS2PL</span>
+        </div>
+        <button onclick="refreshAll()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition flex items-center gap-1.5 border border-slate-700">
+          <i class="fa-solid fa-arrows-rotate"></i> Refresh
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- Tab Bar -->
+    <div class="flex border-b border-slate-800 space-x-2 mb-8 overflow-x-auto pb-1">
+      <button onclick="switchTab('tab-nodes')" id="btn-tab-nodes" class="tab-btn active px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 border-blue-500 text-blue-400 bg-slate-800/40 transition flex items-center gap-2">
+        <i class="fa-solid fa-server"></i> Node Topology
+      </button>
+      <button onclick="switchTab('tab-2pc')" id="btn-tab-2pc" class="tab-btn px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 transition flex items-center gap-2">
+        <i class="fa-solid fa-handshake"></i> Two-Phase Commit (2PC)
+      </button>
+      <button onclick="switchTab('tab-query')" id="btn-tab-query" class="tab-btn px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 transition flex items-center gap-2">
+        <i class="fa-solid fa-terminal"></i> Distributed SQL & QEP
+      </button>
+      <button onclick="switchTab('tab-concurrency')" id="btn-tab-concurrency" class="tab-btn px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 transition flex items-center gap-2">
+        <i class="fa-solid fa-lock"></i> Concurrency & Deadlocks
+      </button>
+      <button onclick="switchTab('tab-fragmentation')" id="btn-tab-fragmentation" class="tab-btn px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 transition flex items-center gap-2">
+        <i class="fa-solid fa-cubes"></i> Fragmentation & Replication
+      </button>
+      <button onclick="switchTab('tab-benchmarks')" id="btn-tab-benchmarks" class="tab-btn px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 transition flex items-center gap-2">
+        <i class="fa-solid fa-chart-line"></i> Performance Evaluation
+      </button>
+    </div>
+
+    <!-- TAB 1: Node Topology -->
+    <section id="tab-nodes" class="tab-content">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="node-cards-container">
+        <!-- Rendered via JavaScript -->
+        <div class="p-6 rounded-2xl bg-slate-800/60 border border-slate-700/60 animate-pulse">Loading nodes...</div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Network Simulator Card -->
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-base font-semibold text-white flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-sliders text-blue-400"></i> Fault Injection & Network Partition Simulation
+          </h2>
+          <p class="text-xs text-slate-400 mb-4">Test cluster resilience by partitioning branch nodes or forcing cohort abort votes during distributed transactions.</p>
+          <div class="grid grid-cols-2 gap-4 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1">Partition Between:</label>
+              <select id="part-node-a" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+                <option value="NODE_HQ">NODE_HQ (New York)</option>
+                <option value="NODE_LON">NODE_LON (London)</option>
+                <option value="NODE_TYO">NODE_TYO (Tokyo)</option>
+                <option value="NODE_SGP">NODE_SGP (Singapore)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-400 mb-1">And Node:</label>
+              <select id="part-node-b" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200">
+                <option value="NODE_LON">NODE_LON (London)</option>
+                <option value="NODE_TYO" selected>NODE_TYO (Tokyo)</option>
+                <option value="NODE_SGP">NODE_SGP (Singapore)</option>
+                <option value="NODE_HQ">NODE_HQ (New York)</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-4 flex gap-3">
+            <button onclick="togglePartition(true)" class="px-4 py-2 bg-rose-600/80 hover:bg-rose-600 text-white text-xs font-medium rounded-lg transition">
+              <i class="fa-solid fa-scissors mr-1"></i> Apply Network Partition
+            </button>
+            <button onclick="togglePartition(false)" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium rounded-lg transition">
+              <i class="fa-solid fa-link mr-1"></i> Heal Partition
+            </button>
+          </div>
+          <div id="partition-status-msg" class="mt-3 text-xs text-slate-400"></div>
+        </div>
+
+        <!-- Network Latency Matrix -->
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6">
+          <h2 class="text-base font-semibold text-white flex items-center gap-2 mb-4">
+            <i class="fa-solid fa-globe text-indigo-400"></i> Inter-Branch WAN Latency Matrix
+          </h2>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead>
+                <tr class="text-slate-400 border-b border-slate-700">
+                  <th class="py-2">From \ To</th>
+                  <th class="py-2">HQ (NYC)</th>
+                  <th class="py-2">London</th>
+                  <th class="py-2">Tokyo</th>
+                  <th class="py-2">Singapore</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800 font-mono text-slate-300">
+                <tr><td class="py-2 font-sans font-medium text-slate-400">HQ (NYC)</td><td class="text-slate-500">2ms</td><td>35ms</td><td>65ms</td><td>75ms</td></tr>
+                <tr><td class="py-2 font-sans font-medium text-slate-400">London</td><td>35ms</td><td class="text-slate-500">2ms</td><td>95ms</td><td>85ms</td></tr>
+                <tr><td class="py-2 font-sans font-medium text-slate-400">Tokyo</td><td>65ms</td><td>95ms</td><td class="text-slate-500">2ms</td><td>30ms</td></tr>
+                <tr><td class="py-2 font-sans font-medium text-slate-400">Singapore</td><td>75ms</td><td>85ms</td><td>30ms</td><td class="text-slate-500">2ms</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: Two-Phase Commit (2PC) -->
+    <section id="tab-2pc" class="tab-content hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Transfer Form -->
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 lg:col-span-1">
+          <h2 class="text-base font-semibold text-white flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-money-bill-transfer text-emerald-400"></i> Execute Cross-Branch 2PC Transfer
+          </h2>
+          <p class="text-xs text-slate-400 mb-6">Executes a multi-branch transaction enforcing ACID atomicity via Two-Phase Commit across participant cohorts.</p>
+
+          <div class="space-y-4 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1 font-medium">Source Account (Debit)</label>
+              <select id="transfer-from" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200">
+                <option value="ACC_LON_01">ACC_LON_01 (London Branch) - Checking</option>
+                <option value="ACC_LON_02">ACC_LON_02 (London Branch) - Savings</option>
+                <option value="ACC_HQ_01">ACC_HQ_01 (HQ New York) - Checking</option>
+                <option value="ACC_TYO_01">ACC_TYO_01 (Tokyo Branch) - Corporate</option>
+                <option value="ACC_SGP_01">ACC_SGP_01 (Singapore Branch) - Checking</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-slate-400 mb-1 font-medium">Destination Account (Credit)</label>
+              <select id="transfer-to" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200">
+                <option value="ACC_TYO_01" selected>ACC_TYO_01 (Tokyo Branch) - Corporate</option>
+                <option value="ACC_SGP_01">ACC_SGP_01 (Singapore Branch) - Checking</option>
+                <option value="ACC_HQ_02">ACC_HQ_02 (HQ New York) - Corporate</option>
+                <option value="ACC_LON_01">ACC_LON_01 (London Branch) - Checking</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-slate-400 mb-1 font-medium">Transfer Amount ($ USD)</label>
+              <input type="number" id="transfer-amount" value="500.00" step="50" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-slate-200 font-mono">
+            </div>
+
+            <button onclick="trigger2PCTransfer()" id="btn-run-2pc" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 transition flex items-center justify-center gap-2 mt-4">
+              <i class="fa-solid fa-play"></i> Run Two-Phase Commit
+            </button>
+          </div>
+        </div>
+
+        <!-- 2PC Execution Timeline Trace -->
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 lg:col-span-2">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-base font-semibold text-white flex items-center gap-2">
+              <i class="fa-solid fa-timeline text-blue-400"></i> Protocol Timeline & WAL Event Trace
+            </h2>
+            <span id="2pc-badge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-700 text-slate-300">Ready</span>
+          </div>
+
+          <div id="2pc-timeline-container" class="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+            <div class="text-xs text-slate-500 italic p-6 text-center border border-dashed border-slate-700 rounded-xl">
+              Initiate a transfer above to watch the step-by-step 2PC Prepare, Voting, WAL Logging, and Decision phases in real-time.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Distributed SQL & QEP -->
+    <section id="tab-query" class="tab-content hidden">
+      <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 mb-6">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-base font-semibold text-white flex items-center gap-2">
+            <i class="fa-solid fa-code text-blue-400"></i> Distributed SQL Console
+          </h2>
+          <!-- Preset templates -->
+          <div class="flex gap-2">
+            <button onclick="setQueryTemplate('prune')" class="px-2.5 py-1 text-xs bg-slate-700/60 hover:bg-slate-700 rounded text-slate-300 transition">Fragment Pruning</button>
+            <button onclick="setQueryTemplate('join')" class="px-2.5 py-1 text-xs bg-slate-700/60 hover:bg-slate-700 rounded text-slate-300 transition">Cross-Branch Join</button>
+            <button onclick="setQueryTemplate('vertical')" class="px-2.5 py-1 text-xs bg-slate-700/60 hover:bg-slate-700 rounded text-slate-300 transition">Vertical Reconstruction</button>
+            <button onclick="setQueryTemplate('agg')" class="px-2.5 py-1 text-xs bg-slate-700/60 hover:bg-slate-700 rounded text-slate-300 transition">Distributed Aggregation</button>
+          </div>
+        </div>
+
+        <textarea id="sql-input" rows="3" class="w-full bg-slate-950 font-mono text-sm border border-slate-700 rounded-xl p-3 text-emerald-400 focus:outline-none focus:border-blue-500" spellcheck="false">SELECT * FROM accounts WHERE branch_id = 'BRANCH_LON'</textarea>
+
+        <div class="mt-3 flex items-center justify-between">
+          <div class="text-xs text-slate-400" id="query-meta-info">Ready to execute.</div>
+          <button onclick="runSQLQuery()" class="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs rounded-xl shadow-lg shadow-blue-500/20 transition flex items-center gap-2">
+            <i class="fa-solid fa-bolt"></i> Execute Query
+          </button>
+        </div>
+      </div>
+
+      <!-- Query Execution Plan & Results -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- QEP Diagram -->
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 lg:col-span-1">
+          <h3 class="text-sm font-semibold text-white flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-sitemap text-indigo-400"></i> Query Execution Plan (QEP)
+          </h3>
+          <div id="qep-container" class="space-y-3 text-xs">
+            <p class="text-slate-500 italic">Run a query to inspect cost-based optimization and fragment pruning.</p>
+          </div>
+        </div>
+
+        <!-- Result Table -->
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6 lg:col-span-2 overflow-x-auto">
+          <h3 class="text-sm font-semibold text-white flex items-center gap-2 mb-3">
+            <i class="fa-solid fa-table text-emerald-400"></i> Result Dataset (<span id="result-count">0</span> rows)
+          </h3>
+          <div id="query-result-table-wrapper" class="overflow-x-auto max-h-[450px]">
+            <p class="text-xs text-slate-500 italic">No query executed yet.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: Concurrency & Deadlocks -->
+    <section id="tab-concurrency" class="tab-content hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-base font-semibold text-white">Strict Two-Phase Locking (SS2PL) & Deadlock Monitor</h2>
+          <p class="text-xs text-slate-400">Real-time visibility into shared (S) and exclusive (X) row locks, active waiters, and Distributed Wait-For Graphs.</p>
+        </div>
+        <button onclick="runDeadlockDetection()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-xl transition flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved"></i> Run Deadlock Cycle Detector
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="lock-tables-container">
+        <!-- Rendered dynamically -->
+        <div class="p-6 bg-slate-800/40 border border-slate-800 rounded-2xl animate-pulse">Loading lock tables...</div>
+      </div>
+    </section>
+
+    <!-- TAB 5: Fragmentation & Replication -->
+    <section id="tab-fragmentation" class="tab-content hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Horizontal Card -->
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6">
+          <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center mb-3">
+            <i class="fa-solid fa-arrows-split-up-and-left"></i>
+          </div>
+          <h3 class="text-sm font-bold text-white mb-1">Primary Horizontal Fragmentation</h3>
+          <p class="text-xs text-slate-400 mb-4">Tables partitioned horizontally across branch sites based on primary branch predicates.</p>
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+              <span class="font-semibold text-slate-300">accounts_lon:</span>
+              <span class="text-emerald-400 font-mono">branch_id = 'BRANCH_LON'</span>
+              <div class="text-[10px] text-slate-500">Stored at NODE_LON (London)</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+              <span class="font-semibold text-slate-300">accounts_tyo:</span>
+              <span class="text-emerald-400 font-mono">branch_id = 'BRANCH_TYO'</span>
+              <div class="text-[10px] text-slate-500">Stored at NODE_TYO (Tokyo)</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+              <span class="font-semibold text-slate-300">accounts_sgp:</span>
+              <span class="text-emerald-400 font-mono">branch_id = 'BRANCH_SGP'</span>
+              <div class="text-[10px] text-slate-500">Stored at NODE_SGP (Singapore)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vertical Card -->
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6">
+          <div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-3">
+            <i class="fa-solid fa-table-columns"></i>
+          </div>
+          <h3 class="text-sm font-bold text-white mb-1">Vertical Fragmentation</h3>
+          <p class="text-xs text-slate-400 mb-4">Attributes projected across nodes; reconstructed transparently via Natural Join on PK.</p>
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+              <span class="font-semibold text-slate-300">cust_basic (Branch):</span>
+              <div class="text-[10px] font-mono text-indigo-400 mt-1">['cust_id', 'name', 'branch_id', 'email', 'phone']</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+              <span class="font-semibold text-slate-300">cust_kyc (HQ + Quorum):</span>
+              <div class="text-[10px] font-mono text-indigo-400 mt-1">['cust_id', 'credit_score', 'annual_income', 'risk_tier', 'tax_id']</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Replication Card -->
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-6">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-3">
+            <i class="fa-solid fa-clone"></i>
+          </div>
+          <h3 class="text-sm font-bold text-white mb-1">Replication & Quorums</h3>
+          <p class="text-xs text-slate-400 mb-4">Full replication for dimension tables; Quorum consensus with Vector Clocks for KYC profile.</p>
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+              <span class="font-semibold text-slate-300">branches & exchange_rates:</span>
+              <div class="text-[10px] text-emerald-400 mt-1">Full Replication across all 4 nodes</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+              <span class="font-semibold text-slate-300">cust_kyc Quorum:</span>
+              <div class="text-[10px] text-emerald-400 mt-1">N=3, W=2, R=2 (Strict Quorum: W + R > N)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: Performance Evaluation -->
+    <section id="tab-benchmarks" class="tab-content hidden">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-base font-semibold text-white">System Performance Evaluation & Benchmarks</h2>
+          <p class="text-xs text-slate-400">Automated benchmarks measuring TPS throughput, response time latency distributions, consistency invariant, and Semi-Join reduction.</p>
+        </div>
+        <button onclick="runLiveEvaluation()" id="btn-eval" class="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-medium text-xs rounded-xl shadow-lg shadow-blue-500/20 transition flex items-center gap-2">
+          <i class="fa-solid fa-play"></i> Run Live Benchmark Suite
+        </button>
+      </div>
+
+      <!-- Benchmark Charts Gallery -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-4">
+          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Throughput vs. Concurrency</h3>
+          <img id="chart-throughput" src="/static/charts/benchmark_throughput.png" class="w-full rounded-xl border border-slate-800" alt="Throughput Chart">
+        </div>
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-4">
+          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Latency: Single-Node vs Distributed 2PC</h3>
+          <img id="chart-latency" src="/static/charts/benchmark_latency.png" class="w-full rounded-xl border border-slate-800" alt="Latency Chart">
+        </div>
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-4">
+          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Semi-Join Bandwidth Reduction</h3>
+          <img id="chart-semijoin" src="/static/charts/benchmark_semijoin.png" class="w-full rounded-xl border border-slate-800" alt="Semi-Join Chart">
+        </div>
+        <div class="bg-slate-800/40 border border-slate-800 rounded-2xl p-4">
+          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">ACID Consistency Invariant Audit</h3>
+          <img id="chart-consistency" src="/static/charts/benchmark_consistency.png" class="w-full rounded-xl border border-slate-800" alt="Consistency Chart">
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

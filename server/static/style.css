@@ -1,0 +1,43 @@
+/* Custom Styles for IDBMS Console */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+.timeline-step {
+  position: relative;
+  padding-left: 2rem;
+}
+.timeline-step::before {
+  content: '';
+  position: absolute;
+  left: 0.6rem;
+  top: 1.5rem;
+  bottom: -0.5rem;
+  width: 2px;
+  background: #334155;
+}
+.timeline-step:last-child::before {
+  display: none;
+}
